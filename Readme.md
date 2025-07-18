@@ -1,4 +1,5 @@
-# Auth0-Clone: Self-Hosted Authentication Service
+#<h1 align="center">Auth0-Clone: Self-Hosted Authentication Service</h1>
+
 
 <p align="center">
   <img src="frontend/public/favicon.svg" alt="Logo" width="64" height="64" />
