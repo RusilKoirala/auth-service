@@ -1,4 +1,4 @@
-#<h1 align="center">Auth0-Clone: Self-Hosted Authentication Service</h1>
+<h1 align="center">Auth0-Clone: Self-Hosted Authentication Service</h1>
 
 
 <p align="center">
