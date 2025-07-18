@@ -14,6 +14,25 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    role: {
+        type: String,
+        enum: ['user', 'admin'],
+        default: 'user',
+    },
+    // Email verification fields
+    emailVerified: {
+        type: Boolean,
+        default: false,
+    },
+    emailVerificationToken: String,
+    emailVerificationExpires: Date,
+    // 2FA placeholders
+    twoFactorEnabled: {
+        type: Boolean,
+        default: false,
+    },
+    twoFactorSecret: String,
+    backupCodes: [String],
 
 }, { timestamps: true });
 

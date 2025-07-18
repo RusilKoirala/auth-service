@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
 
 // Helper function to get auth token from localStorage
 const getAuthToken = () => {
@@ -14,7 +14,6 @@ const getProjectApiKey = () => {
 // Generic API request function
 const apiRequest = async (endpoint, options = {}) => {
   const url = `${API_BASE_URL}${endpoint}`;
-  
   const config = {
     headers: {
       'Content-Type': 'application/json',
@@ -23,10 +22,14 @@ const apiRequest = async (endpoint, options = {}) => {
     ...options,
   };
 
-  // Add auth token if available
-  const token = getAuthToken();
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  // Only add auth token if requireAuth is true (default: true except for public endpoints)
+  if (options.requireAuth !== false) {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      // console.log('[apiRequest] No auth token found in localStorage');
+    }
   }
 
   // Add project API key if available and required
@@ -39,12 +42,10 @@ const apiRequest = async (endpoint, options = {}) => {
 
   try {
     const response = await fetch(url, config);
-    
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
     }
-    
     return await response.json();
   } catch (error) {
     console.error('API request failed:', error);
@@ -59,6 +60,7 @@ export const mainAuthAPI = {
     return apiRequest('/auth/register', {
       method: 'POST',
       body: JSON.stringify(userData),
+      requireAuth: false,
     });
   },
 
@@ -67,6 +69,7 @@ export const mainAuthAPI = {
     return apiRequest('/auth/login', {
       method: 'POST',
       body: JSON.stringify(credentials),
+      requireAuth: false,
     });
   },
 
@@ -147,6 +150,12 @@ export const projectAPI = {
     return apiRequest('/projects/create', {
       method: 'POST',
       body: JSON.stringify({ name }),
+    });
+  },
+  // Fetch a single project by ID
+  getProjectById: async (id) => {
+    return apiRequest(`/projects/${id}`, {
+      method: 'GET',
     });
   },
 }; 

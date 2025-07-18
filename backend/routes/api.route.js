@@ -10,8 +10,6 @@ import {
 const router = express.Router();
 
 router.get('/project-data', apiKeyRateLimiter, projectAuthMiddleware, (req, res) => {
-    console.log("✅ API route hit!");
-
   return res.json({
     projectName: req.project.name,
     ownerEmail: req.user.email, // you can access owner too

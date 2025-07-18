@@ -40,7 +40,7 @@ export const Footer = () => {
             <h3 className="text-sm font-semibold text-foreground mb-4">Connect</h3>
             <div className="flex space-x-4">
               <a
-                href="https://github.com"
+                href="https://github.com/rusilkoirala/auth-service"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-foreground transition-colors duration-200"
@@ -48,7 +48,7 @@ export const Footer = () => {
                 <Github className="w-5 h-5" />
               </a>
               <a
-                href="https://twitter.com"
+                href="https://x.com/RusilKoirala"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-foreground transition-colors duration-200"
@@ -65,10 +65,10 @@ export const Footer = () => {
             © 2024 AuthService. All rights reserved.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
-            <Link to="/docs" className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200">
+            <Link to="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200">
               Privacy Policy
             </Link>
-            <Link to="/docs" className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200">
+            <Link to="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200">
               Terms of Service
             </Link>
           </div>

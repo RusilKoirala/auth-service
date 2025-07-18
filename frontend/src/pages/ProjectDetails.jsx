@@ -2,31 +2,58 @@ import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Eye, EyeOff, Copy } from 'lucide-react';
 import { projectAPI, adminAPI } from '../utils/api';
+import { useAuth } from '../context/AuthContext';
+import { ProjectAnalyticsDashboard } from '../components/ProjectAnalyticsDashboard';
 
 export const ProjectDetails = () => {
   const { id } = useParams();
+  const { user } = useAuth();
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [showApiKey, setShowApiKey] = useState(false);
   const [copied, setCopied] = useState(false);
   const [users, setUsers] = useState([]);
   const [usersLoading, setUsersLoading] = useState(true);
   const [usersError, setUsersError] = useState(null);
+  const [showErrorToast, setShowErrorToast] = useState(false);
 
   useEffect(() => {
     const fetchProject = async () => {
       try {
         setLoading(true);
-        const res = await projectAPI.listUserProjects();
-        const found = (res.projects || []).find(p => p._id === id);
-        setProject(found || null);
+        setError(null);
+        const res = await projectAPI.getProjectById(id);
+        setProject(res.project || null);
       } catch (err) {
         setProject(null);
+        // Improved error handling for 401/403
+        if (err.message && err.message.toLowerCase().includes('unauthorized')) {
+          setError('You are not authorized. Please log in.');
+          setShowErrorToast(true);
+          setTimeout(() => {
+            setShowErrorToast(false);
+            window.location.href = '/login';
+          }, 2000);
+        } else if (err.message && err.message.toLowerCase().includes('forbidden')) {
+          setError('You do not have permission to view this project.');
+          setShowErrorToast(true);
+          setTimeout(() => setShowErrorToast(false), 4000);
+        } else {
+          setError('Unable to fetch project details.');
+          setShowErrorToast(true);
+          setTimeout(() => setShowErrorToast(false), 4000);
+        }
       } finally {
         setLoading(false);
       }
     };
-    fetchProject();
+    fetchProject().catch((err) => {
+      setProject(null);
+      setError('Unable to fetch project details.');
+      setShowErrorToast(true);
+      setTimeout(() => setShowErrorToast(false), 4000);
+    });
   }, [id]);
 
   useEffect(() => {
@@ -55,6 +82,15 @@ export const ProjectDetails = () => {
     }
   };
 
+  // Determine if user can view analytics (admin or owner)
+  let canViewAnalytics = false;
+  if (user && project) {
+    const isOwner = project.owner && project.owner._id
+      ? project.owner._id.toString() === user._id.toString()
+      : project.owner && project.owner.toString() === user._id.toString();
+    canViewAnalytics = user.isAdmin === true || isOwner;
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -62,6 +98,14 @@ export const ProjectDetails = () => {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-muted-foreground">Loading...</p>
         </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="card p-8 text-center text-destructive">{error}</div>
       </div>
     );
   }
@@ -76,8 +120,16 @@ export const ProjectDetails = () => {
 
   return (
     <div className="min-h-screen bg-background py-12">
+      {showErrorToast && (
+        <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 bg-destructive text-destructive-foreground px-6 py-3 rounded-lg shadow-lg animate-bounce-in">
+          <span>Unable to fetch project details. Please check the project ID or try again later.</span>
+        </div>
+      )}
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-bold text-foreground mb-4">Project: {project.name}</h1>
+        <div className="mb-2 text-muted-foreground text-sm">
+          Owner: {project.user?.name || project.user?.email || 'Unknown'}
+        </div>
         <div className="card p-6 mb-8">
           <div className="mb-4">
             <span className="text-sm font-medium text-muted-foreground mr-2">API Key:</span>
@@ -111,6 +163,8 @@ export const ProjectDetails = () => {
             <span className="ml-2 text-foreground">{project.createdAt ? new Date(project.createdAt).toLocaleDateString() : 'N/A'}</span>
           </div>
         </div>
+        {/* Analytics Dashboard */}
+        <ProjectAnalyticsDashboard projectId={project._id} canView={canViewAnalytics} />
         <div className="card p-6">
           <h2 className="text-lg font-semibold text-foreground mb-4">Project Users</h2>
           {usersLoading ? (

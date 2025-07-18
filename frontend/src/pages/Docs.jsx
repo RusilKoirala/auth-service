@@ -1,5 +1,7 @@
 import { BookOpen, Code, Key, Users, Shield, Copy } from 'lucide-react';
 import { useState } from 'react';
+import Fuse from 'fuse.js';
+import { useEffect, useRef } from 'react';
 
 const docsSections = [
   {
@@ -31,6 +33,12 @@ const docsSections = [
     title: 'Code Examples',
     icon: Users,
     content: ExamplesSection,
+  },
+  {
+    id: 'faq',
+    title: 'FAQ',
+    icon: Shield,
+    content: FAQSection,
   },
 ];
 
@@ -213,6 +221,61 @@ function ApiReferenceSection() {
 }`}
         />
       </div>
+      <div>
+        <h3 className="text-xl font-bold text-foreground mb-2">GET /api/project-users/verify-email/:token</h3>
+        <div className="mb-2 font-semibold">Description:</div>
+        <p className="text-muted-foreground mb-2">Verify a project user's email address using the token sent via email.</p>
+        <div className="mb-2 font-semibold">Example Request:</div>
+        <CodeBlock
+          lang="bash"
+          code={`curl -X GET http://localhost:5000/api/project-users/verify-email/your_token_here`}
+        />
+        <div className="mb-2 font-semibold">Success Response:</div>
+        <CodeBlock
+          lang="json"
+          code={`{
+  "message": "Email verified successfully"
+}`}
+        />
+        <div className="mb-2 font-semibold">Error Response:</div>
+        <CodeBlock
+          lang="json"
+          code={`{
+  "message": "Invalid or expired verification token"
+}`}
+        />
+      </div>
+      <div>
+        <h3 className="text-xl font-bold text-foreground mb-2">POST /api/project-users/resend-otp</h3>
+        <div className="mb-2 font-semibold">Description:</div>
+        <p className="text-muted-foreground mb-2">Resend the verification email to a project user. Rate-limited to prevent abuse.</p>
+        <div className="mb-2 font-semibold">Headers:</div>
+        <ul className="list-disc ml-6 text-muted-foreground mb-2">
+          <li>Content-Type: application/json</li>
+        </ul>
+        <div className="mb-2 font-semibold">Body:</div>
+        <CodeBlock
+          lang="json"
+          code={`{
+  "email": "user@example.com",
+  "projectId": "project_id_here"
+}`}
+        />
+        <div className="mb-2 font-semibold">Success Response:</div>
+        <CodeBlock
+          lang="json"
+          code={`{
+  "message": "OTP sent successfully."
+}`}
+        />
+        <div className="mb-2 font-semibold">Error Response:</div>
+        <CodeBlock
+          lang="json"
+          code={`{
+  "message": "Email already verified."
+}`}
+        />
+      </div>
     </div>
   );
 }
@@ -267,49 +330,129 @@ const registerUser = async (userData) => {
   );
 }
 
+function FAQSection() {
+  return (
+    <div className="space-y-8">
+      <h3 className="text-2xl font-bold text-foreground mb-4">Frequently Asked Questions</h3>
+      <div className="space-y-6">
+        <div>
+          <h4 className="font-semibold text-lg text-foreground mb-1">What is AuthService?</h4>
+          <p className="text-muted-foreground">AuthService is a self-hosted authentication platform for developers, offering secure, project-scoped user management, email verification, and modern developer UX.</p>
+        </div>
+        <div>
+          <h4 className="font-semibold text-lg text-foreground mb-1">How is this different from Auth0 or Clerk?</h4>
+          <p className="text-muted-foreground">Unlike SaaS solutions, AuthService is open-source and fully under your control. You can self-host, customize, and extend it for your needs, with project-level isolation and analytics.</p>
+        </div>
+        <div>
+          <h4 className="font-semibold text-lg text-foreground mb-1">How does project user email verification work?</h4>
+          <p className="text-muted-foreground">Each project user must verify their email via a unique link sent after registration. Admins can resend verification emails. Unverified users cannot log in.</p>
+        </div>
+        <div>
+          <h4 className="font-semibold text-lg text-foreground mb-1">Can I use my own SMTP provider?</h4>
+          <p className="text-muted-foreground">Yes! Just set your SMTP credentials in the backend <code>.env</code> file. The system works with any standard SMTP server.</p>
+        </div>
+        <div>
+          <h4 className="font-semibold text-lg text-foreground mb-1">Is there a dark mode?</h4>
+          <p className="text-muted-foreground">Yes, you can toggle between dark and light mode using the button in the navbar.</p>
+        </div>
+        <div>
+          <h4 className="font-semibold text-lg text-foreground mb-1">How do I get support or contribute?</h4>
+          <p className="text-muted-foreground">Open an issue or pull request on our <a href="https://github.com/rusilkoirala/auth-service" target="_blank" rel="noopener noreferrer" className="text-primary underline">GitHub repository</a>.</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export const Docs = () => {
   const [active, setActive] = useState(docsSections[0].id);
+  const [search, setSearch] = useState('');
+  const [results, setResults] = useState(docsSections);
+  const searchInputRef = useRef(null);
+
+  // Fuse.js setup
+  const fuse = new Fuse(docsSections, {
+    keys: ['title', 'content'],
+    threshold: 0.3,
+  });
+
+  useEffect(() => {
+    if (search.trim() === '') {
+      setResults(docsSections);
+    } else {
+      const fuseResults = fuse.search(search).map(r => r.item);
+      setResults(fuseResults.length ? fuseResults : []);
+    }
+  }, [search]);
+
+  // Keyboard shortcut for search
+  useEffect(() => {
+    const handler = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-background flex">
-      {/* Sidebar */}
-      <aside className="hidden md:block w-64 border-r border-border bg-card/80 backdrop-blur-lg">
-        <div className="sticky top-20 p-8">
-          <h2 className="text-lg font-bold mb-6 text-foreground">Docs Navigation</h2>
-          <nav className="space-y-2">
-            {docsSections.map((section) => (
-              <button
-                key={section.id}
-                onClick={() => setActive(section.id)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg w-full text-left transition-colors font-medium ${active === section.id ? 'bg-primary/10 text-primary' : 'hover:bg-muted/60 text-muted-foreground'}`}
-              >
-                <section.icon className="w-4 h-4" />
-                {section.title}
-              </button>
-            ))}
-          </nav>
-        </div>
-      </aside>
-      {/* Main Content */}
-      <main className="flex-1 max-w-3xl mx-auto px-4 sm:px-8 py-16">
-        <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h1 className="text-4xl font-bold text-foreground mb-2">Documentation</h1>
-            <p className="text-lg text-muted-foreground">Integrate AuthService into your app in minutes.</p>
+    <div className="min-h-screen bg-background flex flex-col items-center py-12 px-2 md:px-8">
+      <div className="w-full max-w-7xl flex flex-col md:flex-row gap-10">
+        {/* Sidebar */}
+        <aside className="md:w-72 w-full md:sticky md:top-24 flex-shrink-0 mb-8 md:mb-0">
+          <div className="bg-card/80 border border-border rounded-2xl p-6 shadow-sm">
+            <h2 className="text-lg font-bold mb-6 text-foreground tracking-tight">Docs Navigation</h2>
+            <div className="relative mb-6">
+              <input
+                ref={searchInputRef}
+                type="text"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Search docs (Ctrl+K/⌘+K)"
+                className="w-full px-4 py-2 rounded-lg border border-border bg-muted text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition"
+                aria-label="Search documentation"
+              />
+              
+            </div>
+            <nav className="space-y-2">
+              {results.map((section) => (
+                <button
+                  key={section.id}
+                  onClick={() => setActive(section.id)}
+                  className={`block w-full text-left px-3 py-2 rounded-lg font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary ${
+                    active === section.id ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
+                  }`}
+                >
+                  {section.title}
+                </button>
+              ))}
+              {results.length === 0 && (
+                <div className="text-muted-foreground text-sm px-3 py-2">No results found.</div>
+              )}
+            </nav>
           </div>
-        </div>
-        <div className="space-y-12">
-          {docsSections.filter(s => s.id === active).map((section) => (
-            <section key={section.id} id={section.id} className="scroll-mt-20">
-              <div className="flex items-center gap-3 mb-6">
-                <section.icon className="w-6 h-6 text-primary" />
-                <h2 className="text-2xl font-bold text-foreground">{section.title}</h2>
+        </aside>
+        {/* Main Content */}
+        <main className="flex-1 w-full">
+          <div className="bg-card/90 border border-border rounded-2xl shadow-md p-8 md:p-12">
+            <div className="mb-10">
+              <h1 className="text-4xl font-extrabold text-foreground mb-2 tracking-tight">Documentation</h1>
+              <p className="text-lg text-muted-foreground mb-2">Integrate AuthService into your app in minutes.</p>
+              <div className="h-1 w-16 bg-gradient-to-r from-primary to-sky-400 rounded-full mb-2" />
+            </div>
+            {results.length > 0 && (
+              <div>
+                {docsSections.find((s) => s.id === active)?.content()}
               </div>
-              <section.content />
-            </section>
-          ))}
-        </div>
-      </main>
+            )}
+            {results.length === 0 && (
+              <div className="text-muted-foreground text-center text-lg py-12">No documentation found for your search.</div>
+            )}
+          </div>
+        </main>
+      </div>
     </div>
   );
 }; 

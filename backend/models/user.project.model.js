@@ -20,7 +20,14 @@ const UserProjectSchema = new mongoose.Schema({
     type: String,
     enum: ['user', 'admin'],
     default: 'user',
-  }
+  },
+  // Email verification fields
+  emailVerified: {
+    type: Boolean,
+    default: false,
+  },
+  emailVerificationToken: String,
+  emailVerificationExpires: Date,
 }, { timestamps: true });
 
 // Ensure unique email per project

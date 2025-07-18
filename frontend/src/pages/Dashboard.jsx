@@ -1,13 +1,11 @@
 import { useAuth } from '../context/AuthContext';
 import { Navigate } from 'react-router-dom';
-import { Shield, User, Calendar, Activity, LogOut, Eye, EyeOff, Copy } from 'lucide-react';
+import { Shield, User, Calendar, Activity, LogOut } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { projectAPI } from '../utils/api';
 
 export const Dashboard = () => {
   const { user, loading, logout } = useAuth();
-  const [showApiKey, setShowApiKey] = useState(false);
-  const [copied, setCopied] = useState(false);
   const [projects, setProjects] = useState([]);
   const [projectsLoading, setProjectsLoading] = useState(true);
 
@@ -48,14 +46,7 @@ export const Dashboard = () => {
   };
 
   const firstProject = projects[0];
-  const apiKey = firstProject?.apiKey || 'No project found';
   const projectName = firstProject?.name || 'No project';
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(apiKey);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
-  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -195,48 +186,6 @@ export const Dashboard = () => {
                       {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
                     </p>
                   </div>
-                </div>
-              </div>
-            </div>
-
-            {/* API Key Information */}
-            <div className="card p-6">
-              <h3 className="text-lg font-semibold text-foreground mb-4">API Key</h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Your API Key</label>
-                  <div className="mt-1 p-3 bg-muted rounded-lg flex items-center">
-                    <input
-                      type={showApiKey ? 'text' : 'password'}
-                      value={apiKey}
-                      readOnly
-                      className="bg-transparent border-none text-xs font-mono text-foreground flex-1 focus:outline-none"
-                      style={{ minWidth: 0 }}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowApiKey((v) => !v)}
-                      className="ml-2 p-1 rounded hover:bg-muted/70"
-                      aria-label={showApiKey ? 'Hide API Key' : 'Show API Key'}
-                    >
-                      {showApiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleCopy}
-                      className="ml-2 p-1 rounded hover:bg-muted/70"
-                      aria-label="Copy API Key"
-                    >
-                      <Copy className="w-4 h-4" />
-                    </button>
-                    {copied && <span className="ml-2 text-xs text-green-600">Copied!</span>}
-                  </div>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">API Endpoint</label>
-                  <p className="text-sm font-mono text-foreground mt-1">
-                    Use this API key in your project requests as <code>x-api-key</code> header.
-                  </p>
                 </div>
               </div>
             </div>

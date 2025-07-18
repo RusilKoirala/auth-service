@@ -19,7 +19,6 @@ export const createProject = async (req, res) => {
     res.status(201).json({ message: "Project created successfully", project: newProject });
 
   } catch (error) {
-    console.log("Error creating project:", error);
     res.status(500).json({ message: "Failed to create project" });
   }
 };
@@ -67,5 +66,23 @@ export const listUserProjects = async (req, res) => {
   } catch (error) {
     console.error('Error fetching user projects:', error);
     res.status(500).json({ message: 'Failed to fetch projects' });
+  }
+};
+
+// Get a single project by ID
+export const getProjectById = async (req, res) => {
+  const { id } = req.params;
+  if (!id || id.length !== 24) {
+    return res.status(400).json({ message: 'Invalid project ID format.' });
+  }
+  try {
+    const project = await projectModel.findById(id).populate('owner', 'name email');
+    if (!project) {
+      return res.status(404).json({ message: 'Project not found.' });
+    }
+    res.status(200).json({ project });
+  } catch (error) {
+    console.error('Error fetching project by ID:', error);
+    res.status(500).json({ message: 'Failed to fetch project.' });
   }
 };

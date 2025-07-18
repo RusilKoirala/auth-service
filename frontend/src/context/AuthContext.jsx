@@ -59,7 +59,9 @@ export const AuthProvider = ({ children }) => {
         response = await mainAuthAPI.login({ email, password });
       }
       // Store the token
-      authUtils.setToken(response.token);
+      if (response.token) {
+        authUtils.setToken(response.token);
+      }
       // Get user data
       let userData;
       if (isProjectMode()) {

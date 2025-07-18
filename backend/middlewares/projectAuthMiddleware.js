@@ -16,11 +16,8 @@ export const projectAuthMiddleware = async (req, res, next) => {
 
     // Attach to request
     req.project = project;
-    // req.user = project.owner; // REMOVE THIS LINE
-
     next();
   } catch (err) {
-    console.error("Project API auth error:", err);
     return res.status(500).json({ message: 'Internal Server Error' });
   }
 };

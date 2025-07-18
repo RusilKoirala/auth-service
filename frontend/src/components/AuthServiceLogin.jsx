@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
 export function AuthServiceLogin({ apiKey, onSuccess }) {
   const [isLogin, setIsLogin] = useState(true);

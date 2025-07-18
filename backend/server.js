@@ -16,20 +16,35 @@ import adminRoutes from './routes/admin.routes.js';
 
 const app = express();
 
-//Middleware
-app.use(cors({
-    origin: "*", // Adjust this to your frontend URL
-    credentials: true,
-}));
+// Define allowed origins for protected routes
+const allowedOrigins = [
+  'https://your-frontend.com', // Replace with your real frontend URL
+  'http://localhost:5173',    // For local dev
+];
+
+// Public CORS (allow all)
+const publicCors = cors({
+  origin: '*',
+  credentials: false,
+});
+
+// Protected CORS (only allow dashboard/frontend)
+const protectedCors = cors({
+  origin: allowedOrigins,
+  credentials: true,
+});
+
 app.use(express.json());
 app.use(cookieParser());
 
-// Routes
-app.use("/api/auth", userRoutes);
-app.use("/api/projects", projectRoutes);
-app.use("/api", apiRoutes);
-app.use('/api/project-users', projectUserRoutes);
-app.use('/api/admin', adminRoutes);
+// Public API routes (open to all)
+app.use("/api/auth", publicCors, userRoutes);
+app.use("/api/project-users", publicCors, projectUserRoutes);
+
+// Protected/admin routes (restricted)
+app.use("/api/admin", protectedCors, adminRoutes);
+app.use("/api/projects", protectedCors, projectRoutes);
+app.use("/api", protectedCors, apiRoutes); // adjust as needed
 
 app.get("/", (req, res) => {
   res.send("Backend is running");

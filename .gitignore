@@ -1,0 +1,6 @@
+project.md
+DEVELOPMENT.md
+.env
+.env.*
+**/.env
+**/.env.*
