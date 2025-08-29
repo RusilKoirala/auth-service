@@ -28,12 +28,12 @@
 
 ##  Features
 
-- 🏢 **Project-Scoped User Management**: Each project has its own isolated user base, API key, and analytics.
-- 📧 **Email Verification**: Secure signups with built-in email verification (MailerSend or SMTP).
-- 🛡️ **Admin Dashboard & Analytics**: Manage users, resend verification, and view project stats.
-- 🎨 **Modern UI/UX**: Beautiful, responsive, and dark-mode ready for devs and users.
-- 🌐 **Hybrid CORS**: Public/protected API endpoints for SaaS or embedded use.
-- 🐳 **Production-Ready Dockerfile**: Easy deployment to Railway, Render, or your own server.
+- **Project-Scoped User Management**: Each project has its own isolated user base, API key, and analytics.
+- **Email Verification**: Secure signups with built-in email verification (MailerSend or SMTP).
+- **Admin Dashboard & Analytics**: Manage users, resend verification, and view project stats.
+- **Modern UI/UX**: Beautiful, responsive, and dark-mode ready for devs and users.
+- **Hybrid CORS**: Public/protected API endpoints for SaaS or embedded use.
+- **Production-Ready Dockerfile**: Easy deployment to Railway, Render, or your own server.
 
 ---
 
