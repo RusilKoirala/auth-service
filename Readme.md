@@ -26,7 +26,7 @@
 
 ---
 
-## ✨ Features
+##  Features
 
 - 🏢 **Project-Scoped User Management**: Each project has its own isolated user base, API key, and analytics.
 - 📧 **Email Verification**: Secure signups with built-in email verification (MailerSend or SMTP).
@@ -37,7 +37,7 @@
 
 ---
 
-## 🏗️ Architecture
+##  Architecture
 
 ```mermaid
 flowchart LR
@@ -64,7 +64,7 @@ flowchart LR
 
 ---
 
-## 🗝️ Environment Variables
+##  Environment Variables
 
 **Where to put your `.env` files:**
 
@@ -86,7 +86,7 @@ flowchart LR
 
 ---
 
-## 🚀 Quick Start
+##  Quick Start
 
 ```sh
 # Backend
@@ -104,14 +104,14 @@ npm run dev
 
 ---
 
-## 🛠️ Production
+##  Production
 - See the Dockerfile in `/backend` for deployment.
 - Set all secrets in Railway/your host.
 - Frontend: build with `npm run build` and deploy `dist/` to Vercel/Netlify/etc.
 
 ---
 
-## 👥 Contributors
+##  Contributors
 <p>
   <a href="https://github.com/rusilkoirala"><img src="https://avatars.githubusercontent.com/u/10229899?v=4" width="48" height="48" style="border-radius:50%" alt="Rusil Koirala" /></a>
   <!-- Add more contributors here -->
@@ -119,7 +119,7 @@ npm run dev
 
 ---
 
-## 🤝 Contributing
+##  Contributing
 
 We welcome contributions! To get started:
 1. Fork the repository
@@ -130,12 +130,12 @@ We welcome contributions! To get started:
 
 ---
 
-## 📄 Documentation
+##  Documentation
 - [Features & API Reference](#features)
 - [Docs UI](https://github.com/rusilkoirala/auth-service)
 
 ---
 
-## 📝 License
+##  License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
